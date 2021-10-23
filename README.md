@@ -20,7 +20,8 @@ git clone https://github.com/lollobaldo/EXC-cw1--autotester.git
 
 ## Usage
 
-Just `cd` into the repository, install the requirements and run the python file:
+Just `cd` into the repository, install the requirements and run the python file.
+Select the root folder of the project. This is where your `src` and `build.stb` stay.
 ```bash
 cd EXC-cw1--autotester
 pip install promptlib
