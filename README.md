@@ -32,7 +32,7 @@ python runtest.py
 None found yet
 
 ### Benchmarking:
-A benchmark is run on the tasks. The following are the average results for optimal implementations:
+A benchmark is run on the tasks. The following are the average results for optimal implementations. It should be okay if you're within a 5x factor of these.
 
 ```
 ┌────────┬──────┬──────┬──────┐
