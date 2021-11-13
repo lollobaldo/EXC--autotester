@@ -21,12 +21,14 @@ def getDir():
 
 if __name__ == "__main__":
     print("Fetching latest version of the tester...")
-    pull_output = subprocess.check_output(["git", "pull"])
+    #pull_output = subprocess.check_output(["git", "pull"])
     version = subprocess.check_output(["git", "rev-parse", "HEAD"])
     print(f"Running with version {version.decode('ascii')}")
 
     dir = getDir()
+    isCw2 = dir.endswith("-spark")
+    suffix = "cw2" if isCw2 else "cw1"
     copyfile(
-        os.path.join(os.getcwd(), "ImdbSuiteTester.scala"),
+        os.path.join(os.getcwd(), f"ImdbSuiteTester.{suffix}.scala"),
         os.path.join(dir, "src", "test", "scala", "imdb", "ImdbSuiteTester.scala"))
     res = subprocess.run("sbt test", shell=True, cwd=dir)

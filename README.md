@@ -1,5 +1,5 @@
-# EXC-cw1--autotester
-Autotester for Extreme Computing - coursework 1: Scala Collections
+# EXC--autotester
+Autotester for Extreme Computing - coursework 1 and 2: Scala Collections and Spark
 
 ## Notes
 - **Updates**: The tester updates itself through `git pull`. Make sure you run it from its directory and install with `git clone` rather than copying files.
@@ -15,7 +15,7 @@ Autotester for Extreme Computing - coursework 1: Scala Collections
 Just git clone where your coursework files are:
 
 ```bash
-git clone https://github.com/lollobaldo/EXC-cw1--autotester.git
+git clone https://github.com/lollobaldo/EXC--autotester.git
 ```
 
 ## Usage
@@ -23,7 +23,7 @@ git clone https://github.com/lollobaldo/EXC-cw1--autotester.git
 Just `cd` into the repository, install the requirements and run the python file.
 Select the root folder of the project. This is where your `src` and `build.stb` stay.
 ```bash
-cd EXC-cw1--autotester
+cd EXC--autotester
 pip install promptlib
 python runtest.py
 ```
@@ -31,7 +31,7 @@ python runtest.py
 ### Common errors:
 None found yet
 
-### Benchmarking:
+### Benchmarking: (cw1 only)
 A benchmark is run on the tasks. The following are the average results for optimal implementations. It should be okay if you're within a 5x factor of these.
 
 ```
