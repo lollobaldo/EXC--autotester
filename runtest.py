@@ -32,3 +32,4 @@ if __name__ == "__main__":
         os.path.join(os.getcwd(), f"ImdbSuiteTester.{suffix}.scala"),
         os.path.join(dir, "src", "test", "scala", "imdb", "ImdbSuiteTester.scala"))
     res = subprocess.run("sbt test", shell=True, cwd=dir)
+    os.remove(os.path.join(dir, "src", "test", "scala", "imdb", "ImdbSuiteTester.scala"))
