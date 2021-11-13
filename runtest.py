@@ -21,7 +21,7 @@ def getDir():
 
 if __name__ == "__main__":
     print("Fetching latest version of the tester...")
-    #pull_output = subprocess.check_output(["git", "pull"])
+    pull_output = subprocess.check_output(["git", "pull"])
     version = subprocess.check_output(["git", "rev-parse", "HEAD"])
     print(f"Running with version {version.decode('ascii')}")
 
