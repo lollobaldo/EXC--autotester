@@ -98,14 +98,14 @@ class ImdbSuiteTester extends AnyFunSuite with BeforeAndAfterAll {
       }
     }
 
-    def makeTable(content: List[List[String]]): String = {
+    def makeTable(header: String, content: List[List[String]]): String = {
       val topRow = "┌────────┬──────┬──────┬──────┐\n"
       val midRow = "├────────┼──────┼──────┼──────┤\n"
       val botRow = "└────────┴──────┴──────┴──────┘\n"
       val table = content.foldLeft(topRow){ (acc, obj) =>
         acc ++ makeRow(obj.map(padTo4Left)) ++ "\n" ++ midRow
       }
-      table.dropRight(midRow.length) ++ botRow
+      "\n" ++ header ++ "\n" ++table.dropRight(midRow.length) ++ botRow
     }
 
     def makeProgress(current: Double, total: Double, length: Int) = {
@@ -143,7 +143,8 @@ class ImdbSuiteTester extends AnyFunSuite with BeforeAndAfterAll {
           formatValue(values.sum / values.length),
           formatValue(values.min),
           formatValue(values.max)) }
-      benchmark_results = makeTable(labels :: tab)
+      val header = " CW1: %d runs".format(runs)
+      benchmark_results = makeTable(header, labels :: tab)
       assert(true)
     }
 
