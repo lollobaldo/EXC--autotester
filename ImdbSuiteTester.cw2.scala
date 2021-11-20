@@ -74,6 +74,79 @@ class ImdbSuiteTester extends AnyFunSuite with BeforeAndAfterAll {
       assertSameElements(given.map(round1), expected.map(round1))
     }
 
+    def timeIt[T](label: String, code: => T): Long = {
+      val start = System.currentTimeMillis()
+      val result = code
+      val stop = System.currentTimeMillis()
+      stop - start
+    }
+
+    def padTo4Left(content: String): String = {
+      " " * (4 - content.length) ++ content
+    }
+
+    def formatValue(value: Long): String = {
+      val str = value.toString
+      val col = if (value <= 75) scala.io.AnsiColor.GREEN else if (value >= 150) scala.io.AnsiColor.RED
+      else scala.io.AnsiColor.WHITE
+      " " * (4 - str.length) ++ col ++ str ++ scala.io.AnsiColor.RESET
+    }
+
+    def makeRow(content: List[String]): String = {
+      content.foldLeft("│"){ (acc, obj) =>
+        acc ++ " " ++ obj ++ " │"
+      }
+    }
+
+    def makeTable(content: List[List[String]]): String = {
+      val topRow = "┌────────┬──────┬──────┬──────┐\n"
+      val midRow = "├────────┼──────┼──────┼──────┤\n"
+      val botRow = "└────────┴──────┴──────┴──────┘\n"
+      val table = content.foldLeft(topRow){ (acc, obj) =>
+        acc ++ makeRow(obj.map(padTo4Left)) ++ "\n" ++ midRow
+      }
+      table.dropRight(midRow.length) ++ botRow
+    }
+
+    def makeProgress(current: Double, total: Double, length: Int) = {
+      val percent = current * 100 / total
+      val arrow   = "█" * (percent/100 * length ).toInt// + ' '
+      val spaces  = "░" * (length - arrow.length)
+
+      print("Benchmarking: " + arrow + spaces + " +" + percent.toInt.toString + "%.\r")
+    }
+
+    var benchmark_results = "";
+    test("Running overall benchmark") {
+      assert(initializeImdb(), INIT_ERR_MSG)
+
+      import ImdbAnalysis._
+
+      var results: (List[Long], List[Long], List[Long], List[Long]) = (List(), List(), List(), List())
+      val runs = 1
+      var i = 0
+      while(i < runs) {
+        makeProgress(i, runs - 1, 40)
+        val t1 = timeIt("Task 1", task1(titleBasicsRDD))
+        val t2 = timeIt("Task 2", task2(titleBasicsRDD, titleRatingsRDD))
+        val t3 = timeIt("Task 3", task3(titleBasicsRDD, titleRatingsRDD))
+        val t4 = timeIt("Task 4", task4(titleBasicsRDD, titleCrewRDD, nameBasicsRDD))
+        results = (t1 :: results._1, t2 :: results._2, t3 :: results._3, t4 :: results._4)
+        i += 1
+      }
+      println() // Print line to fix \r
+      val labels = List("Task  ", "Avg", "Min", "Max")
+      val values = List(results._1, results._2, results._3, results._4)
+      val tab = values.zipWithIndex.map{ case (values, index) =>
+        List[String](
+          "Task " ++ (index+1).toString,
+          formatValue(values.sum / values.length),
+          formatValue(values.min),
+          formatValue(values.max)) }
+      benchmark_results = makeTable(labels :: tab)
+      assert(true)
+    }
+
     test("Task1") {
       assert(initializeImdb(), INIT_ERR_MSG)
       val list = ImdbAnalysis.titleBasicsRDD
@@ -181,75 +254,8 @@ class ImdbSuiteTester extends AnyFunSuite with BeforeAndAfterAll {
       assertSameElements(res, expectedResult)
     }
 
-    def timeIt[T](label: String, code: => T): Long = {
-      val start = System.currentTimeMillis()
-      val result = code
-      val stop = System.currentTimeMillis()
-      stop - start
-    }
-
-    def padTo4Left(content: String): String = {
-      " " * (4 - content.length) ++ content
-    }
-
-    def formatValue(value: Long): String = {
-      val str = value.toString
-      val col = if (value <= 75) scala.io.AnsiColor.GREEN else if (value >= 150) scala.io.AnsiColor.RED
-      else scala.io.AnsiColor.WHITE
-      " " * (4 - str.length) ++ col ++ str ++ scala.io.AnsiColor.RESET
-    }
-
-    def makeRow(content: List[String]): String = {
-      content.foldLeft("│"){ (acc, obj) =>
-        acc ++ " " ++ obj ++ " │"
-      }
-    }
-
-    def makeTable(content: List[List[String]]): String = {
-      val topRow = "┌────────┬──────┬──────┬──────┐\n"
-      val midRow = "├────────┼──────┼──────┼──────┤\n"
-      val botRow = "└────────┴──────┴──────┴──────┘\n"
-      val table = content.foldLeft(topRow){ (acc, obj) =>
-        acc ++ makeRow(obj.map(padTo4Left)) ++ "\n" ++ midRow
-      }
-      table.dropRight(midRow.length) ++ botRow
-    }
-
-    def makeProgress(current: Double, total: Double, length: Int) = {
-      val percent = current * 100 / total
-      val arrow   = "█" * (percent/100 * length ).toInt// + ' '
-      val spaces  = "░" * (length - arrow.length)
-
-      print("Benchmarking: " + arrow + spaces + " +" + percent.toInt.toString + "%.\r")
-    }
-
-    test("Running overall benchmark") {
-      assert(initializeImdb(), INIT_ERR_MSG)
-
-      import ImdbAnalysis._
-
-      var results: (List[Long], List[Long], List[Long], List[Long]) = (List(), List(), List(), List())
-      val runs = 10
-      var i = 0
-      while(i < runs) {
-        makeProgress(i, runs - 1, 40)
-        val t1 = timeIt("Task 1", task1(titleBasicsRDD))
-        val t2 = timeIt("Task 2", task2(titleBasicsRDD, titleRatingsRDD))
-        val t3 = timeIt("Task 3", task3(titleBasicsRDD, titleRatingsRDD))
-        val t4 = timeIt("Task 4", task4(titleBasicsRDD, titleCrewRDD, nameBasicsRDD))
-        results = (t1 :: results._1, t2 :: results._2, t3 :: results._3, t4 :: results._4)
-        i += 1
-      }
-      println() // Print line to fix \r
-      val labels = List("Task  ", "Avg", "Min", "Max")
-      val values = List(results._1, results._2, results._3, results._4)
-      val tab = values.zipWithIndex.map{ case (values, index) =>
-        List[String](
-          "Task " ++ (index+1).toString,
-          formatValue(values.sum / values.length),
-          formatValue(values.min),
-          formatValue(values.max)) }
-      println(makeTable(labels :: tab))
+    test("Printing benchmark results") {
+      println(benchmark_results)
       assert(true)
     }
 }
